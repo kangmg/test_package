@@ -1,0 +1,5 @@
+scikit-learn
+pytube
+ffmpeg
+moviepy
+scipy
