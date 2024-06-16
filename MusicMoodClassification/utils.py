@@ -6,6 +6,8 @@ import time
 from scipy.io import wavfile
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_audio
 from scipy.io.wavfile import write
+import polars as pl
+import glob
 
 def is_ipython():
   try:
@@ -185,6 +187,23 @@ def YT_query_downloader(youtube_query:str, download_path:str="./tmp", sr=22050, 
     if clear_log and is_ipython():
         clear_output()
 
+
+from preprocessing import get_mcff, get_centroid, get_crossing
+def dataset_builder(data_dir:str):
+    datafiles = glob.glob(os.path.join(data_dir, '*.wav'))
+    datafile_names = [os.path.basename(filepath) for filepath in datafiles]
+    DataSet = pl.DataFrame({
+        "FileName" : datafile_names,
+        "FilePath" : datafiles
+    })
+    FeatureDF = DataSet.with_columns(
+    (pl.col("FilePath").apply(get_mcff)).alias("MCFF"),
+    (pl.col("FilePath").apply(get_centroid)).alias("centroid"),
+    (pl.col("FilePath").apply(get_crossing)).alias("crossing")
+    ).select(["MCFF", "centroid", "crossing"])
+
+    # mood prediction
+    
 
 
 
